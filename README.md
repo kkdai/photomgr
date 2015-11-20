@@ -1,9 +1,9 @@
 photomgr: A photo crawler manager for gomobile usage in Golang
 ======================
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kkdai/photomgr/master/LICENSE) [![Build Status](https://travis-ci.org/kkdai/photomgr.svg)](https://travis-ci.org/kkdai/photomgr)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kkdai/photomgr/master/LICENSE) [![GoDoc](https://godoc.org/github.com/kkdai/photomgr?status.svg)](https://godoc.org/github.com/kkdai/photomgr)[![Build Status](https://travis-ci.org/kkdai/photomgr.svg)](https://travis-ci.org/kkdai/photomgr)
 
 
-A photomgr is a Go package to browse some info (such as PTT/CK101)  and download image if any default image in that article. This tool help you to download those photos for your backup, all the photos still own by original creator. 
+A photomgr is a Go package to browse some info (such as PTT/CK101.. more)  and download image if any default image in that article. This tool help you to download those photos for your backup, all the photos still own by original creator. 
 
 
 Install
@@ -70,6 +70,20 @@ gomobile build -target=ios github.com/kkdai/photomgr
 //Drag photomgr.framework in your xcode project
 ```
      
+for more detail, check my iOS project [PhotoViewer](https://github.com/kkdai/PhotoViewer)     
+
+
+TODO
+---------------
+
+- [x] PTT
+  - [x] gomobile refine
+- [ ] CK101
+  - [ ] gomobile refine
+- [ ] FB Page
+  - [ ] gomobile refine
+
+
 
 Contribute
 ---------------
