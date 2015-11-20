@@ -1,4 +1,4 @@
-package ptt
+package photomgr
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ type PTT struct {
 	storedStarList      []int
 }
 
-func New() *PTT {
+func NewPTT() *PTT {
 	return new(PTT)
 }
 

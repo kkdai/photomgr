@@ -1,15 +1,15 @@
-ptt: A ptt crawler and image downloader
+photomgr: A photomgr crawler and image downloader
 ======================
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kkdai/ptt/master/LICENSE) [![Build Status](https://travis-ci.org/kkdai/ptt.svg)](https://travis-ci.org/kkdai/ptt)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kkdai/photomgr/master/LICENSE) [![Build Status](https://travis-ci.org/kkdai/photomgr.svg)](https://travis-ci.org/kkdai/photomgr)
 
 
-A ptt crawler client to browse broad news and download image if any default image in that article. This tool help you to download those photos for your backup, all the photos still own by original creator. 
+A photomgr crawler client to browse broad news and download image if any default image in that article. This tool help you to download those photos for your backup, all the photos still own by original creator. 
 
 
 Install
 --------------
 
-    go get -u -x github.com/kkdai/ptt
+    go get -u -x github.com/kkdai/photomgr
 
 Usage
 ---------------------

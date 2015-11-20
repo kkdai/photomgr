@@ -13,7 +13,7 @@ import (
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 
-	. "github.com/kkdai/ptt"
+	. "github.com/kkdai/photomgr"
 )
 
 func printPageResult(p *PTT, count int) {
@@ -32,7 +32,7 @@ func (NullWriter) Write([]byte) (int, error) { return 0, nil }
 func main() {
 
 	log.SetOutput(new(NullWriter))
-	ptt := New()
+	ptt := NewPTT()
 
 	usr, _ := user.Current()
 	ptt.BaseDir = fmt.Sprintf("%v/Pictures/iloveptt", usr.HomeDir)
