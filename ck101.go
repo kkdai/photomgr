@@ -12,28 +12,22 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type PTT struct {
+type CK101 struct {
 	//Inherit
 	baseCrawler
 
-	//Handle base folder address to store images
+	//To store current CK101 post result
 	BaseDir string
-
-	//To store current PTT post result
-	storedPostURLList   []string
-	storedPostTitleList []string
-	storedStarList      []int
 }
 
-func NewPTT() *PTT {
-
-	p := new(PTT)
-	p.baseAddress = "https://www.ptt.cc"
-	p.entryAddress = "https://www.ptt.cc/bbs/Beauty/index.html"
-	return p
+func NewCK101() *CK101 {
+	c := new(CK101)
+	c.baseAddress = "https://www.CK101.cc"
+	c.entryAddress = "httPs://www.CK101.cc/bbs/Beauty/index.html"
+	return c
 }
 
-func (p *PTT) Crawler(target string, workerNum int) {
+func (p *CK101) Crawler(target string, workerNum int) {
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
 		log.Println(err)
@@ -76,38 +70,8 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	wg.Wait()
 }
 
-// Return parse page result count, it will be 0 if you still not parse any page
-func (p *PTT) GetCurrentPageResultCount() int {
-	return len(p.storedPostTitleList)
-}
-
-// Get post title by index in current parsed page
-func (p *PTT) GetPostTitleByIndex(postIndex int) string {
-	if postIndex >= len(p.storedPostTitleList) {
-		return ""
-	}
-	return p.storedPostTitleList[postIndex]
-}
-
-// Get post URL by index in current parsed page
-func (p *PTT) GetPostUrlByIndex(postIndex int) string {
-	if postIndex >= len(p.storedPostURLList) {
-		return ""
-	}
-
-	return p.storedPostURLList[postIndex]
-}
-
-// Get post like count by index in current parsed page
-func (p *PTT) GetPostStarByIndex(postIndex int) int {
-	if postIndex >= len(p.storedStarList) {
-		return 0
-	}
-	return p.storedStarList[postIndex]
-}
-
-//Set Ptt board page index, fetch all post and return article count back
-func (p *PTT) ParsePttPageByIndex(page int) int {
+//Set CK101 board page index, fetch all post and return article count back
+func (p *CK101) ParseCK101PageByIndex(page int) int {
 	doc, err := goquery.NewDocument(p.entryAddress)
 	if err != nil {
 		log.Fatal(err)
@@ -134,7 +98,7 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 		})
 		pageNum, _ := strconv.Atoi(maxPageNumberString)
 		pageNum = pageNum - page
-		PageWebSide = fmt.Sprintf("https://www.ptt.cc/bbs/Beauty/index%d.html", pageNum)
+		PageWebSide = fmt.Sprintf("https://www.CK101.cc/bbs/Beauty/index%d.html", pageNum)
 	} else {
 		PageWebSide = p.entryAddress
 	}
