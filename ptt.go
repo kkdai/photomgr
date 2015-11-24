@@ -47,7 +47,7 @@ func (p *PTT) Crawler(target string, workerNum int) {
 			articleTitle = s.Find(".article-meta-value").Text()
 		}
 	})
-	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, threadId.FindStringSubmatch(target)[1], articleTitle)
+	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "PTT", articleTitle)
 	os.MkdirAll(filepath.FromSlash(dir), 0755)
 
 	//Concurrecny

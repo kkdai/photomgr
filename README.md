@@ -78,10 +78,16 @@ TODO
 
 - [x] PTT
   - [x] gomobile refine
+  - [x] download image
 - [x] CK101
-  - [x] gomobile refine
-- [ ] FB Page
-  - [ ] gomobile refine
+  - [x] broad travaeral
+  - [x] download image
+- [ ] Timliao
+  - [ ] broad travaeral
+  - [ ] download image
+- [ ] Gigacircle
+  - [ ] broad travaeral
+  - [ ] download image
 
 
 
