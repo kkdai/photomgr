@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,48 +22,39 @@ type CK101 struct {
 func NewCK101() *CK101 {
 	c := new(CK101)
 	c.baseAddress = "https://www.CK101.cc"
-	c.entryAddress = "httPs://www.CK101.cc/bbs/Beauty/index.html"
+	c.entryAddress = "http://ck101.com/forum-3465-1.html"
 	return c
+}
+func (b *CK101) HasValidURL(url string) bool {
+	log.Println("url=", url)
+	return true
 }
 
 func (p *CK101) Crawler(target string, workerNum int) {
+
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
-		log.Println(err)
-		return
+		panic(err)
 	}
 
-	//Title and folder
-	articleTitle := ""
-	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
-		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
-			articleTitle = s.Find(".article-meta-value").Text()
-		}
-	})
-	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, threadId.FindStringSubmatch(target)[1], articleTitle)
-	os.MkdirAll(filepath.FromSlash(dir), 0755)
+	title := doc.Find("h1#thread_subject").Text()
 
-	//Concurrecny
+	log.Println("[CK101]:", title, " starting downloading...")
+	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "CK101", title)
+
+	os.MkdirAll(dir, 0755)
+
 	linkChan := make(chan string)
 	wg := new(sync.WaitGroup)
 	for i := 0; i < workerNum; i++ {
 		wg.Add(1)
-		go p.worker(filepath.FromSlash(dir), linkChan, wg)
+		go p.worker(dir, linkChan, wg)
 	}
 
-	//Parse Image, currently support <IMG SRC> only
-	foundImage := false
-	doc.Find(".richcontent").Each(func(i int, s *goquery.Selection) {
-		imgLink, exist := s.Find("img").Attr("src")
-		if exist {
-			linkChan <- "http:" + imgLink
-			foundImage = true
-		}
+	doc.Find("div[itemprop=articleBody] img").Each(func(i int, img *goquery.Selection) {
+		imgUrl, _ := img.Attr("file")
+		linkChan <- imgUrl
 	})
-
-	if !foundImage {
-		log.Println("Don't have any image in this article.")
-	}
 
 	close(linkChan)
 	wg.Wait()
@@ -81,55 +71,43 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 	postList := make([]string, 0)
 	starList := make([]int, 0)
 
-	maxPageNumberString := ""
 	var PageWebSide string
-	if page > 0 {
+	page = page + 1 //one base
+	if page > 1 {
 		// Find page result
-		doc.Find(".btn-group a").Each(func(i int, s *goquery.Selection) {
-			if strings.Contains(s.Text(), "上頁") {
-				href, exist := s.Attr("href")
-				if exist {
-					targetString := strings.Split(href, "index")[1]
-					targetString = strings.Split(targetString, ".html")[0]
-					log.Println("total page:", targetString)
-					maxPageNumberString = targetString
-				}
-			}
-		})
-		pageNum, _ := strconv.Atoi(maxPageNumberString)
-		pageNum = pageNum - page
-		PageWebSide = fmt.Sprintf("https://www.CK101.cc/bbs/Beauty/index%d.html", pageNum)
+		PageWebSide = fmt.Sprintf("http://ck101.com/forum-3465-%d.html", page)
 	} else {
 		PageWebSide = p.entryAddress
 	}
+	//fmt.Println("Page", PageWebSide)
 
 	doc, err = goquery.NewDocument(PageWebSide)
 	if err != nil {
 		log.Fatal(err)
 	}
+	doc.Find(".titleBox").Each(func(i int, s *goquery.Selection) {
 
-	doc.Find(".r-ent").Each(func(i int, s *goquery.Selection) {
-		title := strings.TrimSpace(s.Find(".title").Text())
-		likeCount, _ := strconv.Atoi(s.Find(".nrec span").Text())
-		href, _ := s.Find(".title a").Attr("href")
-		link := p.baseAddress + href
-		urlList = append(urlList, link)
-		log.Printf("%d:[%d★]%s\n", i, likeCount, title)
-		starList = append(starList, likeCount)
+		star := ""
+		title := ""
+		url := ""
+		starInt := 0
+		s.Find(".blockTitle a").Each(func(i int, tQ *goquery.Selection) {
+			title, _ = tQ.Attr("title")
+			url, _ = tQ.Attr("href")
+		})
+		s.Find(".icoPage img").Each(func(i int, starC *goquery.Selection) {
+			star_c, _ := starC.Attr("title")
+			if strings.Contains(star_c, "熱度") {
+				star = strings.TrimPrefix(star_c, "熱度:")
+				star = strings.TrimSpace(star)
+				starInt, _ = strconv.Atoi(star)
+			}
+			//}
+		})
+		urlList = append(urlList, url)
+		starList = append(starList, starInt)
 		postList = append(postList, title)
 	})
-
-	// Print pages
-	log.Printf("Pages: ")
-	for i := page - 3; i <= page+2; i++ {
-		if i >= 0 {
-			if i == page {
-				log.Printf("[%v] ", i)
-			} else {
-				log.Printf("%v ", i)
-			}
-		}
-	}
 
 	p.storedPostURLList = urlList
 	p.storedStarList = starList
