@@ -78,8 +78,8 @@ TODO
 
 - [x] PTT
   - [x] gomobile refine
-- [ ] CK101
-  - [ ] gomobile refine
+- [x] CK101
+  - [x] gomobile refine
 - [ ] FB Page
   - [ ] gomobile refine
 
