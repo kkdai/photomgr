@@ -41,7 +41,10 @@ func (p *CK101) Crawler(target string, workerNum int) {
 
 	log.Println("[CK101]:", title, " starting downloading...")
 	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "CK101", title)
-
+	if exist, _ := exists(dir); exist {
+		//fmt.Println("Already download")
+		return
+	}
 	os.MkdirAll(dir, 0755)
 
 	linkChan := make(chan string)

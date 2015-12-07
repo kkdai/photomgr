@@ -63,6 +63,17 @@ func (b *baseCrawler) GetPostStarByIndex(postIndex int) int {
 	return b.storedStarList[postIndex]
 }
 
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
+}
+
 func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 

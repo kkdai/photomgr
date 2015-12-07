@@ -48,6 +48,10 @@ func (p *PTT) Crawler(target string, workerNum int) {
 		}
 	})
 	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "PTT", articleTitle)
+	if exist, _ := exists(dir); exist {
+		//fmt.Println("Already download")
+		return
+	}
 	os.MkdirAll(filepath.FromSlash(dir), 0755)
 
 	//Concurrecny
