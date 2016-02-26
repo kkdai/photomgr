@@ -88,7 +88,7 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 	if err != nil {
 		log.Fatal(err)
 	}
-	doc.Find(".titleBox").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".threadrow").Each(func(i int, s *goquery.Selection) {
 
 		star := ""
 		title := ""
