@@ -11,42 +11,26 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type CK101 struct {
+type FBAlbum struct {
 	//Inherit
 	baseCrawler
 
-	//To store current CK101 post result
+	//To store current FBAlbum post result
 	BaseDir string
 }
 
-func NewCK101() *CK101 {
-	c := new(CK101)
-	c.baseAddress = "https://www.CK101.cc"
-	c.entryAddress = "http://ck101.com/forum-3465-1.html"
+func NewFBAlbum() *FBAlbum {
+	c := new(FBAlbum)
+	c.baseAddress = "https://www.FBAlbum.cc"
+	c.entryAddress = "http://FBAlbum.com/forum-3465-1.html"
 	return c
 }
-func (b *CK101) HasValidURL(url string) bool {
+func (b *FBAlbum) HasValidURL(url string) bool {
 	log.Println("url=", url)
 	return true
 }
 
-func (p *CK101) GetUrlPhotos(target string) []string {
-	var resultSlice []string
-
-	doc, err := goquery.NewDocument(target)
-	if err != nil {
-		panic(err)
-		return nil
-	}
-
-	doc.Find("div[itemprop=articleBody] img").Each(func(i int, img *goquery.Selection) {
-		imgUrl, _ := img.Attr("file")
-		resultSlice = append(resultSlice, imgUrl)
-	})
-	return resultSlice
-}
-
-func (p *CK101) Crawler(target string, workerNum int) {
+func (p *FBAlbum) Crawler(target string, workerNum int) {
 
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
@@ -55,8 +39,8 @@ func (p *CK101) Crawler(target string, workerNum int) {
 
 	title := doc.Find("h1#thread_subject").Text()
 
-	log.Println("[CK101]:", title, " starting downloading...")
-	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "CK101", title)
+	log.Println("[FBAlbum]:", title, " starting downloading...")
+	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "FBAlbum", title)
 	if exist, _ := exists(dir); exist {
 		//fmt.Println("Already download")
 		return
@@ -79,8 +63,8 @@ func (p *CK101) Crawler(target string, workerNum int) {
 	wg.Wait()
 }
 
-//Set CK101 board page index, fetch all post and return article count back
-func (p *CK101) ParseCK101PageByIndex(page int) int {
+//Set FBAlbum board page index, fetch all post and return article count back
+func (p *FBAlbum) ParseFBAlbumPageByIndex(page int) int {
 	doc, err := goquery.NewDocument(p.entryAddress)
 	if err != nil {
 		log.Fatal(err)
@@ -94,7 +78,7 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 	page = page + 1 //one base
 	if page > 1 {
 		// Find page result
-		PageWebSide = fmt.Sprintf("http://ck101.com/forum-3465-%d.html", page)
+		PageWebSide = fmt.Sprintf("http://FBAlbum.com/forum-3465-%d.html", page)
 	} else {
 		PageWebSide = p.entryAddress
 	}
@@ -104,7 +88,7 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 	if err != nil {
 		log.Fatal(err)
 	}
-	doc.Find(".threadrow").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".titleBox").Each(func(i int, s *goquery.Selection) {
 
 		star := ""
 		title := ""
