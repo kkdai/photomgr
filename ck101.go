@@ -36,7 +36,6 @@ func (p *CK101) GetUrlPhotos(target string) []string {
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
 		panic(err)
-		return nil
 	}
 
 	doc.Find("div[itemprop=articleBody] img").Each(func(i int, img *goquery.Selection) {
