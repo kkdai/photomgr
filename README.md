@@ -64,7 +64,7 @@ gomobile init
 
 //Get this package and build package for iOS
 go get github.com/kkdai/photomgr
-gomobile build -target=ios github.com/kkdai/photomgr
+gomobile bind -target=ios github.com/kkdai/photomgr
 
 //It will generate a photomgr.framework in your cd $GOPATH/src/github.com/kkdai/photomgr
 //Drag photomgr.framework in your xcode project
