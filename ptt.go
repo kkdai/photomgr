@@ -33,8 +33,7 @@ func NewPTT() *PTT {
 	return p
 }
 
-
-func (p *PTT) GetUrlPhotos(target string)[]string {
+func (p *PTT) GetUrlPhotos(target string) []string {
 	var resultSlice []string
 	doc, err := goquery.NewDocument(target)
 	if err != nil {
@@ -46,7 +45,7 @@ func (p *PTT) GetUrlPhotos(target string)[]string {
 	doc.Find(".richcontent").Each(func(i int, s *goquery.Selection) {
 		imgLink, exist := s.Find("img").Attr("src")
 		if exist {
-			resultSlice = append(resultSlice,  "http:" + imgLink)
+			resultSlice = append(resultSlice, "http:"+imgLink)
 		}
 	})
 	return resultSlice
@@ -83,10 +82,15 @@ func (p *PTT) Crawler(target string, workerNum int) {
 
 	//Parse Image, currently support <IMG SRC> only
 	foundImage := false
-	doc.Find(".richcontent").Each(func(i int, s *goquery.Selection) {
-		imgLink, exist := s.Find("img").Attr("src")
-		if exist {
-			linkChan <- "http:" + imgLink
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		imgLink, _ := s.Attr("href")
+		if strings.Contains(imgLink, "https://i.imgur.com/") {
+			linkChan <- imgLink
+			foundImage = true
+		}
+		if strings.Contains(imgLink, "https://imgur.com/") {
+			imgLink = imgLink + ".jpg"
+			linkChan <- imgLink
 			foundImage = true
 		}
 	})
@@ -156,7 +160,7 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 			}
 		})
 		pageNum, _ := strconv.Atoi(maxPageNumberString)
-		pageNum = pageNum - page
+		pageNum = pageNum - page + 1
 		PageWebSide = fmt.Sprintf("https://www.ptt.cc/bbs/Beauty/index%d.html", pageNum)
 	} else {
 		PageWebSide = p.entryAddress
