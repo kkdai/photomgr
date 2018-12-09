@@ -84,11 +84,17 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	foundImage := false
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
-		if strings.Contains(imgLink, "https://i.imgur.com/") {
+		switch {
+		case strings.Contains(imgLink, "https://i.imgur.com/"):
 			linkChan <- imgLink
 			foundImage = true
-		}
-		if strings.Contains(imgLink, "https://imgur.com/") {
+		case strings.Contains(imgLink, "http://i.imgur.com/"):
+			linkChan <- imgLink
+			foundImage = true
+		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
+			linkChan <- imgLink
+			foundImage = true
+		case strings.Contains(imgLink, "https://imgur.com/"):
 			imgLink = imgLink + ".jpg"
 			linkChan <- imgLink
 			foundImage = true
