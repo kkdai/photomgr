@@ -2,6 +2,7 @@ package photomgr
 
 import (
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"log"
@@ -87,8 +88,11 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 
 		m, _, err := image.Decode(resp.Body)
 		if err != nil {
-			log.Printf("image.Decode\nerror: %s\ntarget: %s\n", err, target)
-			continue
+			m, err = png.Decode(resp.Body)
+			if err != nil {
+				log.Printf("image.Decode\nerror: %s\ntarget: %s", err, target)
+				continue
+			}
 		}
 
 		// Ignore small images
@@ -107,6 +111,8 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 				jpeg.Encode(out, m, nil)
 			case "png":
 				png.Encode(out, m)
+			case "gif":
+				gif.Encode(out, m, nil)
 			}
 		}
 	}
