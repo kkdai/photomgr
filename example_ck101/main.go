@@ -19,8 +19,7 @@ import (
 func printPageResult(p *CK101, count int) {
 	for i := 0; i < count; i++ {
 		title := p.GetPostTitleByIndex(i)
-		likeCount := p.GetPostStarByIndex(i)
-		fmt.Printf("%d:[%d★]%s\n", i, likeCount, title)
+		fmt.Printf("%d: %s\n", i, title)
 	}
 	fmt.Printf("(o: open file in fider, s: top page, n:next, p:prev, quit: quit program)\n")
 }

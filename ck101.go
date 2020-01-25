@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
@@ -87,7 +85,6 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 
 	urlList := make([]string, 0)
 	postList := make([]string, 0)
-	starList := make([]int, 0)
 
 	var PageWebSide string
 	page = page + 1 //one base
@@ -104,33 +101,19 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 		log.Fatal(err)
 	}
 	doc.Find(".cl_box").Each(func(i int, s *goquery.Selection) {
-		star := ""
 		title := ""
 		url := ""
-		starInt := 0
 		s.Find("a").Each(func(i int, tQ *goquery.Selection) {
 			title, _ = tQ.Attr("title")
 			goUrl, _ := tQ.Attr("href")
 			url = fmt.Sprintf("%s/%s", p.baseAddress, goUrl)
 		})
-		s.Find("em").Each(func(i int, starC *goquery.Selection) {
-			star_c, _ := starC.Attr("title")
-			fmt.Println("star_c:", star_c)
-			if strings.Contains(star_c, "查看") {
-				star = strings.Replace(star_c, "查看", "", -1)
-				fmt.Println("star:", star)
-				star = strings.TrimSpace(star)
-				starInt, _ = strconv.Atoi(star)
-			}
-			//}
-		})
+
 		urlList = append(urlList, url)
-		starList = append(starList, starInt)
 		postList = append(postList, title)
 	})
 
 	p.storedPostURLList = urlList
-	p.storedStarList = starList
 	p.storedPostTitleList = postList
 
 	return len(p.storedPostTitleList)
