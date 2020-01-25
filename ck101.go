@@ -21,8 +21,8 @@ type CK101 struct {
 
 func NewCK101() *CK101 {
 	c := new(CK101)
-	c.baseAddress = "https://www.CK101.cc"
-	c.entryAddress = "http://ck101.com/forum-1345-1.html"
+	c.baseAddress = "https://ck101.com"
+	c.entryAddress = "https://ck101.com/forum-1345-1.html"
 	return c
 }
 func (b *CK101) HasValidURL(url string) bool {
@@ -48,6 +48,7 @@ func (p *CK101) GetUrlPhotos(target string) []string {
 func (p *CK101) Crawler(target string, workerNum int) {
 
 	doc, err := goquery.NewDocument(target)
+	log.Println("Down load target URL=", target)
 	if err != nil {
 		panic(err)
 	}
@@ -109,7 +110,8 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 		starInt := 0
 		s.Find("a").Each(func(i int, tQ *goquery.Selection) {
 			title, _ = tQ.Attr("title")
-			url, _ = tQ.Attr("href")
+			goUrl, _ := tQ.Attr("href")
+			url = fmt.Sprintf("%s/%s", p.baseAddress, goUrl)
 		})
 		s.Find("em").Each(func(i int, starC *goquery.Selection) {
 			star_c, _ := starC.Attr("title")
