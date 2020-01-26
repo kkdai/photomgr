@@ -3,6 +3,7 @@ package photomgr
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -35,7 +36,9 @@ func NewPTT() *PTT {
 
 func (p *PTT) GetUrlPhotos(target string) []string {
 	var resultSlice []string
-	doc, err := goquery.NewDocument(target)
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(target)
+	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -52,7 +55,9 @@ func (p *PTT) GetUrlPhotos(target string) []string {
 }
 
 func (p *PTT) Crawler(target string, workerNum int) {
-	doc, err := goquery.NewDocument(target)
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(target)
+	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		log.Println(err)
 		return
@@ -141,7 +146,9 @@ func (p *PTT) GetPostStarByIndex(postIndex int) int {
 
 //Set Ptt board page index, fetch all post and return article count back
 func (p *PTT) ParsePttPageByIndex(page int) int {
-	doc, err := goquery.NewDocument(p.entryAddress)
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(p.entryAddress)
+	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -172,7 +179,9 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 		PageWebSide = p.entryAddress
 	}
 
-	doc, err = goquery.NewDocument(PageWebSide)
+	// Get https response with setting cookie over18=1
+	resp = getResponseWithCookie(PageWebSide)
+	doc, err = goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -205,4 +214,20 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 	p.storedPostTitleList = postList
 
 	return len(p.storedPostTitleList)
+}
+
+func getResponseWithCookie(url string) *http.Response {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal("http failed:", err)
+	}
+
+	req.AddCookie(&http.Cookie{Name: "over18", Value: "1"})
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("client failed:", err)
+	}
+	return resp
 }
