@@ -21,7 +21,7 @@ type FBAlbum struct {
 
 func NewFBAlbum() *FBAlbum {
 	c := new(FBAlbum)
-	c.baseAddress = "https://www.FBAlbum.cc"
+	c.baseAddress = "https://www.FBAlbum.com"
 	c.entryAddress = "http://FBAlbum.com/forum-3465-1.html"
 	return c
 }
