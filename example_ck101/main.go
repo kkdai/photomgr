@@ -42,9 +42,9 @@ func main() {
 		Short: "Download all the images in given post url",
 		Run: func(cmd *cobra.Command, args []string) {
 			page := 0
-			pagePostCoubt := 0
-			pagePostCoubt = c.ParseCK101PageByIndex(page)
-			printPageResult(c, pagePostCoubt)
+			pagePostCount := 0
+			pagePostCount = c.ParseCK101PageByIndex(page)
+			printPageResult(c, pagePostCount)
 
 			scanner := bufio.NewScanner(os.Stdin)
 			quit := false
@@ -66,18 +66,18 @@ func main() {
 					quit = true
 				case "n":
 					page = page + 1
-					pagePostCoubt = c.ParseCK101PageByIndex(page)
-					printPageResult(c, pagePostCoubt)
+					pagePostCount = c.ParseCK101PageByIndex(page)
+					printPageResult(c, pagePostCount)
 				case "p":
 					if page > 0 {
 						page = page - 1
 					}
-					pagePostCoubt = c.ParseCK101PageByIndex(page)
-					printPageResult(c, pagePostCoubt)
+					pagePostCount = c.ParseCK101PageByIndex(page)
+					printPageResult(c, pagePostCount)
 				case "s":
 					page = 0
-					pagePostCoubt = c.ParseCK101PageByIndex(page)
-					printPageResult(c, pagePostCoubt)
+					pagePostCount = c.ParseCK101PageByIndex(page)
+					printPageResult(c, pagePostCount)
 				case "o":
 					open.Run(filepath.FromSlash(c.BaseDir))
 				case "d":
