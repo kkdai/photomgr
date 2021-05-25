@@ -4,3 +4,7 @@ example_ck101/example_ck101
 example_iloveptt/example_iloveptt
 example_ck101/example_ck101
 .vscode
+cmd/ptt_cli/example_iloveptt
+.gitignore
+cmd/ck101_cli/ck101_cli
+cmd/ptt_cli/ptt_cli
