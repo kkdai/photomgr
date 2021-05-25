@@ -14,7 +14,7 @@ Install
 Usage
 ---------------------
 
-refer example for more detail.
+refer `cmd/ptt_cli` or `cmd/ck101_cli` for more detail.
 
 ```go
 ptt := NewPTT()
