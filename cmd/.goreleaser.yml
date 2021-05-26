@@ -1,0 +1,23 @@
+# .goreleaser.yml
+builds:
+  - main: ./cmd/ptt_cli
+    id: "ptt"
+    binary: ptt_cli
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+  - main: ./cmd/ck101_cli
+    id: "ck101"
+    binary: ck101_cli
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
