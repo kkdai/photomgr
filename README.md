@@ -14,7 +14,7 @@ Install
 Usage
 ---------------------
 
-refer `cmd/ptt_cli` or `cmd/ck101_cli` for more detail.
+refer `cmd/ptt_cli` or `cmd/ck101_cli` for more detail. 
 
 ```go
 ptt := NewPTT()
@@ -40,7 +40,21 @@ for i := 0; i < totalPostCount ; i_++ {
 
 ```
 
-For more detail check example_iloveptt which is a sample program with [iloveptt](http://github.com/kkdai/ilovept)
+If you want to run it directly, just run 
+
+### PTT CLI 
+
+```
+go install github.com/kkdai/photomgr/cmd/ptt_cli
+```
+
+### CK101 CLI 
+
+```
+go install github.com/kkdai/photomgr/cmd/ck101_cli
+```
+
+Refer [iloveptt](https://github.com/kkdai/iloveptt) for detail commands.
 
 Gomobile supported
 --------------
