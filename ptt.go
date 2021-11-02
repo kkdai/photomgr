@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -269,4 +270,9 @@ func getResponseWithCookie(url string) *http.Response {
 		log.Fatal("client failed:", err)
 	}
 	return resp
+}
+
+func CheckTitleWithBeauty(title string) bool {
+	d, _ := regexp.MatchString("^\\[正妹\\].*", title)
+	return d
 }
