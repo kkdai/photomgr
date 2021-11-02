@@ -114,6 +114,45 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	wg.Wait()
 }
 
+// GetAllImageAddress: return all image address in current page.
+func (p *PTT) GetAllImageAddress(target string) []string {
+	var ret []string
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(target)
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
+	//Parse Image, currently support <IMG SRC> only
+	foundImage := false
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		imgLink, _ := s.Attr("href")
+		switch {
+		case strings.Contains(imgLink, "https://i.imgur.com/"):
+			ret = append(ret, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "http://i.imgur.com/"):
+			ret = append(ret, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
+			ret = append(ret, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "https://imgur.com/"):
+			imgLink = imgLink + ".jpg"
+			ret = append(ret, imgLink)
+			foundImage = true
+		}
+	})
+
+	if !foundImage {
+		log.Println("Don't have any image in this article.")
+	}
+
+	return ret
+}
+
 // Return parse page result count, it will be 0 if you still not parse any page
 func (p *PTT) GetCurrentPageResultCount() int {
 	return len(p.storedPostTitleList)

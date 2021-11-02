@@ -116,3 +116,8 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 
 	return len(p.storedPostTitleList)
 }
+
+// GetAllImageAddress: return all image address in current page.
+func (p *CK101) GetAllImageAddress(target string) []string {
+	return nil
+}
