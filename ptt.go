@@ -272,6 +272,28 @@ func getResponseWithCookie(url string) *http.Response {
 	return resp
 }
 
+func (p *PTT) GetPostLikeDis(target string) (int, int) {
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(target)
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Println(err)
+		return 0, 0
+	}
+
+	var likeCount int
+	var disLikeCount int
+	doc.Find(".push-tag").Each(func(i int, s *goquery.Selection) {
+		if strings.Contains(s.Text(), "推") {
+			likeCount++
+		} else if strings.Contains(s.Text(), "噓") {
+			disLikeCount++
+		}
+	})
+	// fmt.Println("like:", likeCount, " dislike:", disLikeCount)
+	return likeCount, disLikeCount
+}
+
 func CheckTitleWithBeauty(title string) bool {
 	d, _ := regexp.MatchString("^\\[正妹\\].*", title)
 	return d

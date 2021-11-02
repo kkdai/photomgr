@@ -17,3 +17,19 @@ func TestURLPhoto(t *testing.T) {
 		}
 	}
 }
+
+func TestURLLike(t *testing.T) {
+	ptt := NewPTT()
+	title := ptt.GetPostTitleByIndex(5)
+	if CheckTitleWithBeauty(title) {
+		url := ptt.GetPostUrlByIndex(5)
+		if !ptt.HasValidURL(url) {
+			t.Errorf("URLPhoto: URL is not correct")
+		}
+
+		like, dis := ptt.GetPostLikeDis(url)
+		if like == 0 && dis == 0 {
+			t.Errorf("like:%d, dis:%d", like, dis)
+		}
+	}
+}
