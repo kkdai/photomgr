@@ -118,3 +118,8 @@ func (p *FBAlbum) ParseFBAlbumPageByIndex(page int) int {
 
 	return len(p.storedPostTitleList)
 }
+
+// GetAllImageAddress: return all image address in current page.
+func (p *FBAlbum) GetAllImageAddress(target string) []string {
+	return nil
+}
