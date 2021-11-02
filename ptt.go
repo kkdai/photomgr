@@ -125,14 +125,6 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 		return nil
 	}
 
-	//Title and folder
-	articleTitle := ""
-	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
-		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
-			articleTitle = s.Find(".article-meta-value").Text()
-		}
-	})
-
 	//Parse Image, currently support <IMG SRC> only
 	foundImage := false
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
