@@ -228,13 +228,15 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 
 	doc.Find(".r-ent").Each(func(i int, s *goquery.Selection) {
 		title := strings.TrimSpace(s.Find(".title").Text())
-		likeCount, _ := strconv.Atoi(s.Find(".nrec span").Text())
-		href, _ := s.Find(".title a").Attr("href")
-		link := p.baseAddress + href
-		urlList = append(urlList, link)
-		log.Printf("%d:[%d★]%s\n", i, likeCount, title)
-		starList = append(starList, likeCount)
-		postList = append(postList, title)
+		if CheckTitleWithBeauty(title) {
+			likeCount, _ := strconv.Atoi(s.Find(".nrec span").Text())
+			href, _ := s.Find(".title a").Attr("href")
+			link := p.baseAddress + href
+			urlList = append(urlList, link)
+			log.Printf("%d:[%d★]%s\n", i, likeCount, title)
+			starList = append(starList, likeCount)
+			postList = append(postList, title)
+		}
 	})
 
 	// Print pages
