@@ -33,3 +33,17 @@ func TestURLLike(t *testing.T) {
 		}
 	}
 }
+
+func TestUAllGirls(t *testing.T) {
+	ptt := NewPTT()
+	count := ptt.ParsePttPageByIndex(0)
+	for i := 0; i < count; i++ {
+		title := ptt.GetPostTitleByIndex(i)
+		if CheckTitleWithBeauty(title) {
+			url := ptt.GetPostUrlByIndex(i)
+			if !ptt.HasValidURL(url) {
+				t.Errorf("All Girl: %d post, title: %s \n", i, title)
+			}
+		}
+	}
+}
