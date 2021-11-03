@@ -207,7 +207,6 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 				if exist {
 					targetString := strings.Split(href, "index")[1]
 					targetString = strings.Split(targetString, ".html")[0]
-					log.Println("total page:", targetString)
 					maxPageNumberString = targetString
 				}
 			}
@@ -233,23 +232,11 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 			href, _ := s.Find(".title a").Attr("href")
 			link := p.baseAddress + href
 			urlList = append(urlList, link)
-			log.Printf("%d:[%d★]%s\n", i, likeCount, title)
+			// log.Printf("%d:[%d★]%s\n", i, likeCount, title)
 			starList = append(starList, likeCount)
 			postList = append(postList, title)
 		}
 	})
-
-	// Print pages
-	log.Printf("Pages: ")
-	for i := page - 3; i <= page+2; i++ {
-		if i >= 0 {
-			if i == page {
-				log.Printf("[%v] ", i)
-			} else {
-				log.Printf("%v ", i)
-			}
-		}
-	}
 
 	p.storedPostURLList = urlList
 	p.storedStarList = starList
