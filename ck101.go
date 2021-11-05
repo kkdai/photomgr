@@ -82,8 +82,7 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 		log.Fatal(err)
 	}
 
-	urlList := make([]string, 0)
-	postList := make([]string, 0)
+	posts := make([]PostDoc, 0)
 
 	var PageWebSide string
 	page = page + 1 //one base
@@ -107,14 +106,17 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 			url = fmt.Sprintf("%s/%s", p.baseAddress, goUrl)
 		})
 
-		urlList = append(urlList, url)
-		postList = append(postList, title)
+		newPost := PostDoc{
+			ArticleID:    "",
+			ArticleTitle: title,
+			URL:          url,
+		}
+
+		posts = append(posts, newPost)
 	})
 
-	p.storedPostURLList = urlList
-	p.storedPostTitleList = postList
-
-	return len(p.storedPostTitleList)
+	p.storedPost = posts
+	return len(p.storedPost)
 }
 
 // GetAllImageAddress: return all image address in current page.

@@ -70,9 +70,7 @@ func (p *FBAlbum) ParseFBAlbumPageByIndex(page int) int {
 		log.Fatal(err)
 	}
 
-	urlList := make([]string, 0)
-	postList := make([]string, 0)
-	starList := make([]int, 0)
+	posts := make([]PostDoc, 0)
 
 	var PageWebSide string
 	page = page + 1 //one base
@@ -107,16 +105,17 @@ func (p *FBAlbum) ParseFBAlbumPageByIndex(page int) int {
 			}
 			//}
 		})
-		urlList = append(urlList, url)
-		starList = append(starList, starInt)
-		postList = append(postList, title)
+
+		newPost := PostDoc{
+			ArticleTitle: title,
+			URL:          url,
+			Likeint:      starInt,
+		}
+		posts = append(posts, newPost)
 	})
 
-	p.storedPostURLList = urlList
-	p.storedStarList = starList
-	p.storedPostTitleList = postList
-
-	return len(p.storedPostTitleList)
+	p.storedPost = posts
+	return len(p.storedPost)
 }
 
 // GetAllImageAddress: return all image address in current page.

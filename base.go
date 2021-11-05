@@ -19,10 +19,8 @@ type baseCrawler struct {
 	baseAddress  string
 	entryAddress string
 
-	//To store current baseCrawler post result
-	storedPostURLList   []string
-	storedPostTitleList []string
-	storedStarList      []int
+	// //To store current baseCrawler post result
+	storedPost []PostDoc
 }
 
 var (
@@ -36,32 +34,32 @@ func (b *baseCrawler) HasValidURL(url string) bool {
 
 // Return parse page result count, it will be 0 if you still not parse any page
 func (b *baseCrawler) GetCurrentPageResultCount() int {
-	return len(b.storedPostTitleList)
+	return len(b.storedPost)
 }
 
 // Get post title by index in current parsed page
 func (b *baseCrawler) GetPostTitleByIndex(postIndex int) string {
-	if postIndex >= len(b.storedPostTitleList) {
+	if postIndex >= len(b.storedPost) {
 		return ""
 	}
-	return b.storedPostTitleList[postIndex]
+	return b.storedPost[postIndex].ArticleTitle
 }
 
 // Get post URL by index in current parsed page
 func (b *baseCrawler) GetPostUrlByIndex(postIndex int) string {
-	if postIndex >= len(b.storedPostURLList) {
+	if postIndex >= len(b.storedPost) {
 		return ""
 	}
 
-	return b.storedPostURLList[postIndex]
+	return b.storedPost[postIndex].URL
 }
 
 // Get post like count by index in current parsed page
 func (b *baseCrawler) GetPostStarByIndex(postIndex int) int {
-	if postIndex >= len(b.storedStarList) {
+	if postIndex >= len(b.storedPost) {
 		return 0
 	}
-	return b.storedStarList[postIndex]
+	return b.storedPost[postIndex].Likeint
 }
 
 func exists(path string) (bool, error) {

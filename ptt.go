@@ -20,11 +20,6 @@ type PTT struct {
 
 	//Handle base folder address to store images
 	BaseDir string
-
-	//To store current PTT post result
-	storedPostURLList   []string
-	storedPostTitleList []string
-	storedStarList      []int
 }
 
 func NewPTT() *PTT {
@@ -156,32 +151,32 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 
 // Return parse page result count, it will be 0 if you still not parse any page
 func (p *PTT) GetCurrentPageResultCount() int {
-	return len(p.storedPostTitleList)
+	return len(p.storedPost)
 }
 
 // Get post title by index in current parsed page
 func (p *PTT) GetPostTitleByIndex(postIndex int) string {
-	if postIndex >= len(p.storedPostTitleList) {
+	if postIndex >= len(p.storedPost) {
 		return ""
 	}
-	return p.storedPostTitleList[postIndex]
+	return p.storedPost[postIndex].ArticleTitle
 }
 
 // Get post URL by index in current parsed page
 func (p *PTT) GetPostUrlByIndex(postIndex int) string {
-	if postIndex >= len(p.storedPostURLList) {
+	if postIndex >= len(p.storedPost) {
 		return ""
 	}
 
-	return p.storedPostURLList[postIndex]
+	return p.storedPost[postIndex].URL
 }
 
 // Get post like count by index in current parsed page
 func (p *PTT) GetPostStarByIndex(postIndex int) int {
-	if postIndex >= len(p.storedStarList) {
+	if postIndex >= len(p.storedPost) {
 		return 0
 	}
-	return p.storedStarList[postIndex]
+	return p.storedPost[postIndex].Likeint
 }
 
 //Set Ptt board page index, fetch all post and return article count back
@@ -193,9 +188,7 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 		log.Fatal(err)
 	}
 
-	urlList := make([]string, 0)
-	postList := make([]string, 0)
-	starList := make([]int, 0)
+	posts := make([]PostDoc, 0)
 
 	maxPageNumberString := ""
 	var PageWebSide string
@@ -231,18 +224,18 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 			likeCount, _ := strconv.Atoi(s.Find(".nrec span").Text())
 			href, _ := s.Find(".title a").Attr("href")
 			link := p.baseAddress + href
-			urlList = append(urlList, link)
-			// log.Printf("%d:[%d★]%s\n", i, likeCount, title)
-			starList = append(starList, likeCount)
-			postList = append(postList, title)
+			newPost := PostDoc{
+				ArticleID:    "",
+				ArticleTitle: title,
+				URL:          link,
+				Likeint:      likeCount,
+			}
+
+			posts = append(posts, newPost)
 		}
 	})
 
-	p.storedPostURLList = urlList
-	p.storedStarList = starList
-	p.storedPostTitleList = postList
-
-	return len(p.storedPostTitleList)
+	return len(p.storedPost)
 }
 
 func getResponseWithCookie(url string) *http.Response {
