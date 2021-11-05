@@ -115,8 +115,8 @@ func (p *CK101) ParseCK101PageByIndex(page int) int {
 		posts = append(posts, newPost)
 	})
 
-	p.StoredPost = posts
-	return len(p.StoredPost)
+	p.storedPost = posts
+	return len(p.storedPost)
 }
 
 // GetAllImageAddress: return all image address in current page.

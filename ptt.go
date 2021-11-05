@@ -151,32 +151,32 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 
 // Return parse page result count, it will be 0 if you still not parse any page
 func (p *PTT) GetCurrentPageResultCount() int {
-	return len(p.StoredPost)
+	return len(p.storedPost)
 }
 
 // Get post title by index in current parsed page
 func (p *PTT) GetPostTitleByIndex(postIndex int) string {
-	if postIndex >= len(p.StoredPost) {
+	if postIndex >= len(p.storedPost) {
 		return ""
 	}
-	return p.StoredPost[postIndex].ArticleTitle
+	return p.storedPost[postIndex].ArticleTitle
 }
 
 // Get post URL by index in current parsed page
 func (p *PTT) GetPostUrlByIndex(postIndex int) string {
-	if postIndex >= len(p.StoredPost) {
+	if postIndex >= len(p.storedPost) {
 		return ""
 	}
 
-	return p.StoredPost[postIndex].URL
+	return p.storedPost[postIndex].URL
 }
 
 // Get post like count by index in current parsed page
 func (p *PTT) GetPostStarByIndex(postIndex int) int {
-	if postIndex >= len(p.StoredPost) {
+	if postIndex >= len(p.storedPost) {
 		return 0
 	}
-	return p.StoredPost[postIndex].Likeint
+	return p.storedPost[postIndex].Likeint
 }
 
 //Set Ptt board page index, fetch all post and return article count back
@@ -235,7 +235,7 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 		}
 	})
 
-	return len(p.StoredPost)
+	return len(p.storedPost)
 }
 
 func getResponseWithCookie(url string) *http.Response {
