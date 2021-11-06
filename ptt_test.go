@@ -1,6 +1,8 @@
 package photomgr
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetPage(t *testing.T) {
 	ptt := NewPTT()
@@ -8,6 +10,24 @@ func TestGetPage(t *testing.T) {
 	if count == 0 {
 		t.Errorf("ParsePttPageByIndex: no content")
 	}
+}
+
+func TestPageReplace(t *testing.T) {
+	ptt := NewPTT()
+	count1 := ptt.ParsePttPageByIndex(0, true)
+	if count1 == 0 {
+		t.Errorf("ParsePttPageByIndex: no content, p1=%d", count1)
+	}
+	count2 := ptt.ParsePttPageByIndex(1, true)
+	if count2 == 0 {
+		t.Errorf("ParsePttPageByIndex: no content, p2=%d", count2)
+	}
+	count11 := ptt.ParsePttPageByIndex(0, true)
+	count3 := ptt.ParsePttPageByIndex(1, false)
+	if count3 != count1+count2 {
+		t.Errorf("ParsePttPageByIndex: replace failed. page 1:%d page 2: %d, total: %d", count11, count2, count3)
+	}
+
 }
 
 func TestURLPhoto(t *testing.T) {
