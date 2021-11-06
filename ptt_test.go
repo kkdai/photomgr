@@ -2,6 +2,14 @@ package photomgr
 
 import "testing"
 
+func TestGetPage(t *testing.T) {
+	ptt := NewPTT()
+	count := ptt.ParsePttPageByIndex(0, true)
+	if count == 0 {
+		t.Errorf("ParsePttPageByIndex: no content")
+	}
+}
+
 func TestURLPhoto(t *testing.T) {
 	ptt := NewPTT()
 	title := ptt.GetPostTitleByIndex(5)
@@ -36,7 +44,7 @@ func TestURLLike(t *testing.T) {
 
 func TestUAllGirls(t *testing.T) {
 	ptt := NewPTT()
-	count := ptt.ParsePttPageByIndex(0)
+	count := ptt.ParsePttPageByIndex(0, true)
 	for i := 0; i < count; i++ {
 		title := ptt.GetPostTitleByIndex(i)
 		if CheckTitleWithBeauty(title) {
