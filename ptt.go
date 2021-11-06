@@ -179,8 +179,14 @@ func (p *PTT) GetPostStarByIndex(postIndex int) int {
 	return p.storedPost[postIndex].Likeint
 }
 
+//Set Ptt board psot number, fetch assigned number of posts.
+func (p *PTT) ParsePttByNumber(num int) {
+
+	return
+}
+
 //Set Ptt board page index, fetch all post and return article count back
-func (p *PTT) ParsePttPageByIndex(page int) int {
+func (p *PTT) ParsePttPageByIndex(page int, replace bool) int {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(p.entryAddress)
 	doc, err := goquery.NewDocumentFromResponse(resp)
@@ -234,6 +240,11 @@ func (p *PTT) ParsePttPageByIndex(page int) int {
 			posts = append(posts, newPost)
 		}
 	})
+	if replace {
+		p.storedPost = posts
+	} else {
+		p.storedPost = append(p.storedPost, posts...)
+	}
 
 	return len(p.storedPost)
 }
