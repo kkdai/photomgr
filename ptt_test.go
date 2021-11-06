@@ -30,6 +30,14 @@ func TestPageReplace(t *testing.T) {
 
 }
 
+func TestGetNumber(t *testing.T) {
+	ptt := NewPTT()
+	count := ptt.ParsePttByNumber(15, 0)
+	if count < 15 {
+		t.Errorf("TestGetNumber: error get number result, %d", count)
+	}
+}
+
 func TestURLPhoto(t *testing.T) {
 	ptt := NewPTT()
 	title := ptt.GetPostTitleByIndex(5)

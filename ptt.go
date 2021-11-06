@@ -179,10 +179,19 @@ func (p *PTT) GetPostStarByIndex(postIndex int) int {
 	return p.storedPost[postIndex].Likeint
 }
 
-//Set Ptt board psot number, fetch assigned number of posts.
-func (p *PTT) ParsePttByNumber(num int) {
+//Set Ptt board psot number, fetch assigned (at least) number of posts. Return real number.
+func (p *PTT) ParsePttByNumber(num int, page int) int {
+	count := p.ParsePttPageByIndex(page, true)
+	if count > num {
+		return count
+	}
+	page++
+	for count < num {
+		count = p.ParsePttPageByIndex(page, false)
+		page++
+	}
 
-	return
+	return count
 }
 
 //Set Ptt board page index, fetch all post and return article count back
