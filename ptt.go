@@ -50,6 +50,25 @@ func (p *PTT) GetUrlPhotos(target string) []string {
 	return resultSlice
 }
 
+func (p *PTT) GetUrlTitle(target string) string {
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(target)
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	//Title
+	articleTitle := ""
+	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
+		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
+			articleTitle = s.Find(".article-meta-value").Text()
+		}
+	})
+	return articleTitle
+}
+
 func (p *PTT) Crawler(target string, workerNum int) {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(target)
