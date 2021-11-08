@@ -65,6 +65,7 @@ func TestURLTitle(t *testing.T) {
 		if urlTitle == "" || !CheckTitleWithBeauty(urlTitle) {
 			t.Errorf("TestURLTitle: title is not correct url_title=%s title=%s\n", urlTitle, title)
 		}
+		t.Errorf("TestURLTitle: title is not correct url_title=%s title=%s\n", urlTitle, title)
 	}
 }
 
