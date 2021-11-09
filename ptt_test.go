@@ -38,13 +38,13 @@ func TestGetNumber(t *testing.T) {
 	}
 }
 
-func TestURLPhoto(t *testing.T) {
+func TestGetImagesFromURL(t *testing.T) {
 	ptt := NewPTT()
 	ptt.ParsePttByNumber(6, 0)
 	title := ptt.GetPostTitleByIndex(5)
 	if CheckTitleWithBeauty(title) {
 		url := ptt.GetPostUrlByIndex(5)
-		ret := ptt.GetUrlPhotos(url)
+		ret := ptt.GetAllImageAddress(url)
 		if !ptt.HasValidURL(url) {
 			t.Errorf("TestURLPhoto: URL is not correct")
 		}
@@ -65,7 +65,6 @@ func TestURLTitle(t *testing.T) {
 		if urlTitle == "" || !CheckTitleWithBeauty(urlTitle) {
 			t.Errorf("TestURLTitle: title is not correct url_title=%s title=%s\n", urlTitle, title)
 		}
-		t.Errorf("TestURLTitle: title is not correct url_title=%s title=%s\n", urlTitle, title)
 	}
 }
 

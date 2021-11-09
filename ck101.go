@@ -28,21 +28,6 @@ func (b *CK101) HasValidURL(url string) bool {
 	return true
 }
 
-func (p *CK101) GetUrlPhotos(target string) []string {
-	var resultSlice []string
-
-	doc, err := goquery.NewDocument(target)
-	if err != nil {
-		panic(err)
-	}
-
-	doc.Find("div[itemprop=articleBody] img").Each(func(i int, img *goquery.Selection) {
-		imgUrl, _ := img.Attr("file")
-		resultSlice = append(resultSlice, imgUrl)
-	})
-	return resultSlice
-}
-
 func (p *CK101) Crawler(target string, workerNum int) {
 
 	doc, err := goquery.NewDocument(target)

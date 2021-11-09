@@ -30,26 +30,6 @@ func NewPTT() *PTT {
 	return p
 }
 
-func (p *PTT) GetUrlPhotos(target string) []string {
-	var resultSlice []string
-	// Get https response with setting cookie over18=1
-	resp := getResponseWithCookie(target)
-	doc, err := goquery.NewDocumentFromResponse(resp)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-
-	//Parse Image, currently support <IMG SRC> only
-	doc.Find(".richcontent").Each(func(i int, s *goquery.Selection) {
-		imgLink, exist := s.Find("img").Attr("src")
-		if exist {
-			resultSlice = append(resultSlice, "http:"+imgLink)
-		}
-	})
-	return resultSlice
-}
-
 func (p *PTT) GetUrlTitle(target string) string {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(target)
