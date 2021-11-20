@@ -30,6 +30,7 @@ func NewPTT() *PTT {
 	return p
 }
 
+// GetUrlTitle: return title and url of post
 func (p *PTT) GetUrlTitle(target string) string {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(target)
@@ -49,6 +50,7 @@ func (p *PTT) GetUrlTitle(target string) string {
 	return articleTitle
 }
 
+// Crawler: parse ptt board page by index
 func (p *PTT) Crawler(target string, workerNum int) {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(target)
@@ -295,6 +297,7 @@ func (p *PTT) GetPostLikeDis(target string) (int, int) {
 	return likeCount, disLikeCount
 }
 
+// CheckTitleWithBeauty: check if title contains "美女" or "美女圖" or "美女圖片" or "美女圖片"
 func CheckTitleWithBeauty(title string) bool {
 	d, _ := regexp.MatchString("^\\[正妹\\].*", title)
 	return d
