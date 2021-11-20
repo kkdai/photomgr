@@ -97,3 +97,29 @@ func TestUAllGirls(t *testing.T) {
 		}
 	}
 }
+
+func TestAllfromURL(t *testing.T) {
+	ptt := NewPTT()
+	count := ptt.ParsePttPageByIndex(0, true)
+	if count == 0 {
+		t.Fatal("ptt parse error.")
+	}
+	url := ptt.GetPostUrlByIndex(5)
+	title, images, like, dis := ptt.GetAllFromURL(url)
+	if title == "" || images == nil {
+		t.Errorf("TestAllfromURL: title=%s, images=%v\n", title, images)
+	}
+
+	title2 := ptt.GetUrlTitle(url)
+	if title != title2 {
+		t.Errorf("TestAllfromURL: title=%s, title2=%s\n", title, title2)
+	}
+	images2 := ptt.GetAllImageAddress(url)
+	if len(images) != len(images2) {
+		t.Errorf("TestAllfromURL: len(1)=%d, len(2)=%d \n", len(images), len(images2))
+	}
+	like2, dis2 := ptt.GetPostLikeDis(url)
+	if like != like2 || dis != dis2 {
+		t.Errorf("TestAllfromURL: dis=%d, dis2=%d\n", dis, dis2)
+	}
+}
