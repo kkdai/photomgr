@@ -30,6 +30,60 @@ func NewPTT() *PTT {
 	return p
 }
 
+// GetAllFromURL: return all post images, like and dis in current page
+func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like, dis int) {
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(url)
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Println(err)
+		return title, allImages, like, dis
+	}
+
+	//Title and folder
+	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
+		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
+			title = s.Find(".article-meta-value").Text()
+		}
+	})
+
+	//all images
+	foundImage := false
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		imgLink, _ := s.Attr("href")
+		switch {
+		case strings.Contains(imgLink, "https://i.imgur.com/"):
+			allImages = append(allImages, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "http://i.imgur.com/"):
+			allImages = append(allImages, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
+			allImages = append(allImages, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "https://imgur.com/"):
+			imgLink = imgLink + ".jpg"
+			allImages = append(allImages, imgLink)
+			foundImage = true
+		}
+	})
+
+	if !foundImage {
+		log.Println("Don't have any image in this article.")
+	}
+
+	//Like and Dislike
+	doc.Find(".push-tag").Each(func(i int, s *goquery.Selection) {
+		if strings.Contains(s.Text(), "推") {
+			like++
+		} else if strings.Contains(s.Text(), "噓") {
+			dis++
+		}
+	})
+
+	return title, allImages, like, dis
+}
+
 // GetUrlTitle: return title and url of post
 func (p *PTT) GetUrlTitle(target string) string {
 	// Get https response with setting cookie over18=1
