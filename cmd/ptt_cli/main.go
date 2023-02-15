@@ -22,7 +22,7 @@ func printPageResult(p *PTT, count int) {
 		likeCount := p.GetPostStarByIndex(i)
 		fmt.Printf("%d:[%d★]%s\n", i, likeCount, title)
 	}
-	fmt.Printf("(o: open file in fider, s: top page, n:next, p:prev, quit: quit program)\n")
+	fmt.Printf("(o: open file in fider, s: search keyword, t: top page, n:next, p:prev, quit: quit program)\n")
 }
 
 type NullWriter int
@@ -75,12 +75,20 @@ func main() {
 					}
 					pagePostCount = ptt.ParsePttPageByIndex(page, true)
 					printPageResult(ptt, pagePostCount)
-				case "s":
+				case "t":
 					page = 0
 					pagePostCount = ptt.ParsePttPageByIndex(page, true)
 					printPageResult(ptt, pagePostCount)
 				case "o":
 					open.Run(filepath.FromSlash(ptt.BaseDir))
+				case "s":
+					if len(args) == 0 {
+						fmt.Println("You don't input any article index. Input as 's keyword'")
+						continue
+					}
+
+					pagePostCount = ptt.ParseSearchByKeyword(args[0])
+					printPageResult(ptt, pagePostCount)
 				case "d":
 					if len(args) == 0 {
 						fmt.Println("You don't input any article index. Input as 'd 1'")
