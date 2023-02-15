@@ -19,7 +19,8 @@ type PTT struct {
 	baseCrawler
 
 	//Handle base folder address to store images
-	BaseDir string
+	BaseDir       string
+	SearchAddress string
 }
 
 func NewPTT() *PTT {
@@ -27,6 +28,7 @@ func NewPTT() *PTT {
 	p := new(PTT)
 	p.baseAddress = "https://www.ptt.cc"
 	p.entryAddress = "https://www.ptt.cc/bbs/Beauty/index.html"
+	p.SearchAddress = "https://www.ptt.cc/bbs/Beauty/search?q="
 	return p
 }
 
@@ -234,7 +236,7 @@ func (p *PTT) GetPostStarByIndex(postIndex int) int {
 	return p.storedPost[postIndex].Likeint
 }
 
-//Set Ptt board psot number, fetch assigned (at least) number of posts. Return real number.
+// Set Ptt board psot number, fetch assigned (at least) number of posts. Return real number.
 func (p *PTT) ParsePttByNumber(num int, page int) int {
 	count := p.ParsePttPageByIndex(page, true)
 	if count > num {
@@ -249,7 +251,7 @@ func (p *PTT) ParsePttByNumber(num int, page int) int {
 	return count
 }
 
-//Set Ptt board page index, fetch all post and return article count back
+// Set Ptt board page index, fetch all post and return article count back
 func (p *PTT) ParsePttPageByIndex(page int, replace bool) int {
 	// Get https response with setting cookie over18=1
 	resp := getResponseWithCookie(p.entryAddress)
@@ -349,6 +351,36 @@ func (p *PTT) GetPostLikeDis(target string) (int, int) {
 	})
 	// fmt.Println("like:", likeCount, " dislike:", disLikeCount)
 	return likeCount, disLikeCount
+}
+
+// Search with specific keyword, fetch all post and return article count back
+func (p *PTT) ParseSearchByKeyword(keyword string) int {
+	// Get https response with setting cookie over18=1
+	resp := getResponseWithCookie(p.SearchAddress + keyword)
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	posts := make([]PostDoc, 0)
+	doc.Find(".r-ent").Each(func(i int, s *goquery.Selection) {
+		title := strings.TrimSpace(s.Find(".title").Text())
+		if CheckTitleWithBeauty(title) {
+			likeCount, _ := strconv.Atoi(s.Find(".nrec span").Text())
+			href, _ := s.Find(".title a").Attr("href")
+			link := p.baseAddress + href
+			newPost := PostDoc{
+				ArticleID:    "",
+				ArticleTitle: title,
+				URL:          link,
+				Likeint:      likeCount,
+			}
+
+			posts = append(posts, newPost)
+		}
+	})
+	p.storedPost = posts
+	return len(p.storedPost)
 }
 
 // CheckTitleWithBeauty: check if title contains "美女" or "美女圖" or "美女圖片" or "美女圖片"
