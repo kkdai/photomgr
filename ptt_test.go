@@ -104,7 +104,8 @@ func TestAllfromURL(t *testing.T) {
 	if count == 0 {
 		t.Fatal("ptt parse error.")
 	}
-	url := ptt.GetPostUrlByIndex(5)
+	url := ptt.GetPostUrlByIndex(0)
+
 	title, images, like, dis := ptt.GetAllFromURL(url)
 	if title == "" || images == nil {
 		t.Errorf("TestAllfromURL: title=%s, images=%v\n", title, images)
@@ -114,6 +115,7 @@ func TestAllfromURL(t *testing.T) {
 	if title != title2 {
 		t.Errorf("TestAllfromURL: title=%s, title2=%s\n", title, title2)
 	}
+
 	images2 := ptt.GetAllImageAddress(url)
 	if len(images) != len(images2) {
 		t.Errorf("TestAllfromURL: len(1)=%d, len(2)=%d \n", len(images), len(images2))
