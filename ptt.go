@@ -53,21 +53,10 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	foundImage := false
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
-		switch {
-		case strings.Contains(imgLink, "https://i.imgur.com/"):
-			allImages = append(allImages, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "http://i.imgur.com/"):
-			allImages = append(allImages, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
-			allImages = append(allImages, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://imgur.com/"):
-			imgLink = imgLink + ".jpg"
-			allImages = append(allImages, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+		if isImageLink(imgLink) {
+			if strings.Contains(imgLink, "https://imgur.com/") {
+				imgLink = imgLink + ".jpg"
+			}
 			allImages = append(allImages, imgLink)
 			foundImage = true
 		}
@@ -145,21 +134,10 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	foundImage := false
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
-		switch {
-		case strings.Contains(imgLink, "https://i.imgur.com/"):
-			linkChan <- imgLink
-			foundImage = true
-		case strings.Contains(imgLink, "http://i.imgur.com/"):
-			linkChan <- imgLink
-			foundImage = true
-		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
-			linkChan <- imgLink
-			foundImage = true
-		case strings.Contains(imgLink, "https://imgur.com/"):
-			imgLink = imgLink + ".jpg"
-			linkChan <- imgLink
-			foundImage = true
-		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+		if isImageLink(imgLink) {
+			if strings.Contains(imgLink, "https://imgur.com/") {
+				imgLink = imgLink + ".jpg"
+			}
 			linkChan <- imgLink
 			foundImage = true
 		}
@@ -188,21 +166,10 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 	foundImage := false
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
-		switch {
-		case strings.Contains(imgLink, "https://i.imgur.com/"):
-			ret = append(ret, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "http://i.imgur.com/"):
-			ret = append(ret, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://pbs.twimg.com/"):
-			ret = append(ret, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://imgur.com/"):
-			imgLink = imgLink + ".jpg"
-			ret = append(ret, imgLink)
-			foundImage = true
-		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+		if isImageLink(imgLink) {
+			if strings.Contains(imgLink, "https://imgur.com/") {
+				imgLink = imgLink + ".jpg"
+			}
 			ret = append(ret, imgLink)
 			foundImage = true
 		}
@@ -396,4 +363,13 @@ func (p *PTT) ParseSearchByKeyword(keyword string) int {
 func CheckTitleWithBeauty(title string) bool {
 	d, _ := regexp.MatchString("^\\[正妹\\].*", title)
 	return d
+}
+
+// isImageLink checks if the given URL is an image link from supported hosts.
+func isImageLink(url string) bool {
+	return strings.Contains(url, "https://i.imgur.com/") ||
+		strings.Contains(url, "http://i.imgur.com/") ||
+		strings.Contains(url, "https://pbs.twimg.com/") ||
+		strings.Contains(url, "https://imgur.com/") ||
+		strings.Contains(url, "https://i.meee.com.tw/")
 }
