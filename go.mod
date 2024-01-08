@@ -1,6 +1,7 @@
 module github.com/kkdai/photomgr
 
-go 1.20.1
+// +heroku goVersion go1.21.1
+go 1.21.1
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
