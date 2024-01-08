@@ -67,6 +67,10 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 			imgLink = imgLink + ".jpg"
 			allImages = append(allImages, imgLink)
 			foundImage = true
+		//Add support for https://meee.com.tw
+		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+			allImages = append(allImages, imgLink)
+			foundImage = true
 		}
 	})
 
