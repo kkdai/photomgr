@@ -67,6 +67,9 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 			imgLink = imgLink + ".jpg"
 			allImages = append(allImages, imgLink)
 			foundImage = true
+		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+			allImages = append(allImages, imgLink)
+			foundImage = true
 		}
 	})
 
@@ -156,6 +159,9 @@ func (p *PTT) Crawler(target string, workerNum int) {
 			imgLink = imgLink + ".jpg"
 			linkChan <- imgLink
 			foundImage = true
+		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
+			linkChan <- imgLink
+			foundImage = true
 		}
 	})
 
@@ -194,6 +200,9 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 			foundImage = true
 		case strings.Contains(imgLink, "https://imgur.com/"):
 			imgLink = imgLink + ".jpg"
+			ret = append(ret, imgLink)
+			foundImage = true
+		case strings.Contains(imgLink, "https://i.meee.com.tw/"):
 			ret = append(ret, imgLink)
 			foundImage = true
 		}
