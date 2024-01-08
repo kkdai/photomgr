@@ -13,7 +13,7 @@ github.com/skratchdot/open-golang/open
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.3
 github.com/spf13/pflag
-# golang.org/x/net v0.0.0-20201021035429-f5854403a974
+# golang.org/x/net v0.17.0
 ## explicit
 golang.org/x/net/html
 golang.org/x/net/html/atom
