@@ -63,7 +63,7 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	})
 
 	if !foundImage {
-		log.Println("Don't have any image in this article.")
+		log.Println("Don't have any image in this article. url:", url)
 	}
 
 	//Like and Dislike
@@ -144,7 +144,7 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	})
 
 	if !foundImage {
-		log.Println("Don't have any image in this article.")
+		log.Println("Don't have any image in this article. url:", target)
 	}
 
 	close(linkChan)
@@ -176,7 +176,7 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 	})
 
 	if !foundImage {
-		log.Println("Don't have any image in this article.")
+		log.Println("Don't have any image in this article. url:", target)
 	}
 
 	return ret
@@ -371,5 +371,7 @@ func isImageLink(url string) bool {
 		strings.Contains(url, "http://i.imgur.com/") ||
 		strings.Contains(url, "https://pbs.twimg.com/") ||
 		strings.Contains(url, "https://imgur.com/") ||
-		strings.Contains(url, "https://i.meee.com.tw/")
+		strings.Contains(url, "https://i.meee.com.tw/") ||
+		strings.Contains(url, "https://i.ytimg.com/") ||
+		strings.Contains(url, "https://d.img.vision/")
 }
