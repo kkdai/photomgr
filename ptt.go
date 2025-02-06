@@ -148,20 +148,9 @@ func (p *PTT) Crawler(target string, workerNum int) {
 		go p.worker(filepath.FromSlash(dir), linkChan, wg)
 	}
 
-	//Parse Image, currently support <IMG SRC> only
-	foundImage := false
-	doc.Find("a").Each(func(i int, s *goquery.Selection) {
-		imgLink, _ := s.Attr("href")
-		if isImageLink(imgLink) {
-			if strings.Contains(imgLink, "https://imgur.com/") {
-				imgLink = imgLink + ".jpg"
-			}
-			linkChan <- imgLink
-			foundImage = true
-		}
-	})
-
-	if !foundImage {
+	// Optimized: Extract image links once and send them
+	images := extractImageLinks(doc)
+	if len(images) == 0 {
 		log.Println("Don't have any image in this article.")
 	}
 	for _, imgLink := range images {
