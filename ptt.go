@@ -32,6 +32,31 @@ func NewPTT() *PTT {
 	return p
 }
 
+// Add new helper functions to extract title and image links.
+func extractTitle(doc *goquery.Document) string {
+	var title string
+	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
+		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
+			title = s.Find(".article-meta-value").Text()
+		}
+	})
+	return title
+}
+
+func extractImageLinks(doc *goquery.Document) []string {
+	var links []string
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		imgLink, _ := s.Attr("href")
+		if isImageLink(imgLink) {
+			if strings.Contains(imgLink, "https://imgur.com/") {
+				imgLink = imgLink + ".jpg"
+			}
+			links = append(links, imgLink)
+		}
+	})
+	return links
+}
+
 // GetAllFromURL: return all post images, like and dis in current page
 func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like, dis int) {
 	// Get https response with setting cookie over18=1
@@ -63,7 +88,7 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	})
 
 	if !foundImage {
-		log.Println("Don't have any image in this article. url:", url)
+		log.Println("Don't have any image in this article.")
 	}
 
 	//Like and Dislike
@@ -108,21 +133,14 @@ func (p *PTT) Crawler(target string, workerNum int) {
 		return
 	}
 
-	//Title and folder
-	articleTitle := ""
-	doc.Find(".article-metaline").Each(func(i int, s *goquery.Selection) {
-		if strings.Contains(s.Find(".article-meta-tag").Text(), "標題") {
-			articleTitle = s.Find(".article-meta-value").Text()
-		}
-	})
+	articleTitle := extractTitle(doc)
 	dir := fmt.Sprintf("%v/%v - %v", p.BaseDir, "PTT", articleTitle)
 	if exist, _ := exists(dir); exist {
-		//fmt.Println("Already download")
 		return
 	}
 	os.MkdirAll(filepath.FromSlash(dir), 0755)
 
-	//Concurrecny
+	// Prepare concurrent download
 	linkChan := make(chan string)
 	wg := new(sync.WaitGroup)
 	for i := 0; i < workerNum; i++ {
@@ -144,7 +162,10 @@ func (p *PTT) Crawler(target string, workerNum int) {
 	})
 
 	if !foundImage {
-		log.Println("Don't have any image in this article. url:", target)
+		log.Println("Don't have any image in this article.")
+	}
+	for _, imgLink := range images {
+		linkChan <- imgLink
 	}
 
 	close(linkChan)
