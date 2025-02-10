@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 )
 
@@ -25,7 +26,8 @@ type baseCrawler struct {
 
 var (
 	threadId = regexp.MustCompile(`M.(\d*).`)
-	imageId  = regexp.MustCompile(`([^\/]+)\.(png|jpg)`)
+	// Updated to include jpeg extension.
+	imageId  = regexp.MustCompile(`([^\/]+)\.(png|jpg|jpeg)`)
 )
 
 func (b *baseCrawler) HasValidURL(url string) bool {
@@ -77,9 +79,23 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 	defer wg.Done()
 
 	for target := range linkChan {
-		resp, err := http.Get(target)
+		// Create request with custom Referer if needed.
+		req, err := http.NewRequest("GET", target, nil)
 		if err != nil {
-			log.Printf("Http.Get\nerror: %s\ntarget: %s\n", err, target)
+			log.Printf("http.NewRequest error: %s, target: %s", err, target)
+			continue
+		}
+		if strings.Contains(target, "i.imgur.com") {
+			re := regexp.MustCompile(`([^\/]+)\.(jpg|jpeg|png)`)
+			matches := re.FindStringSubmatch(target)
+			if len(matches) >= 2 {
+				req.Header.Set("Referer", "https://imgur.com/"+matches[1])
+			}
+		}
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Printf("client.Do error: %s, target: %s", err, target)
 			continue
 		}
 		defer resp.Body.Close()
@@ -88,7 +104,7 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 		if err != nil {
 			m, err = png.Decode(resp.Body)
 			if err != nil {
-				log.Printf("image.Decode\nerror: %s\ntarget: %s", err, target)
+				log.Printf("image.Decode error: %s, target: %s", err, target)
 				continue
 			}
 		}
@@ -97,14 +113,22 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 		bounds := m.Bounds()
 		if bounds.Size().X > 300 && bounds.Size().Y > 300 {
 			imgInfo := imageId.FindStringSubmatch(target)
-			finalPath := destDir + "/" + imgInfo[1] + "." + imgInfo[2]
+			if len(imgInfo) < 3 {
+				log.Printf("imageId regex did not match target: %s", target)
+				continue
+			}
+			ext := imgInfo[2]
+			if ext == "jpeg" {
+				ext = "jpg"
+			}
+			finalPath := destDir + "/" + imgInfo[1] + "." + ext
 			out, err := os.Create(filepath.FromSlash(finalPath))
 			if err != nil {
-				log.Printf("os.Create\nerror: %s\n", err)
+				log.Printf("os.Create error: %s", err)
 				continue
 			}
 			defer out.Close()
-			switch imgInfo[2] {
+			switch ext {
 			case "jpg":
 				jpeg.Encode(out, m, nil)
 			case "png":
