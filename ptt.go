@@ -43,14 +43,23 @@ func extractTitle(doc *goquery.Document) string {
 	return title
 }
 
+// Add helper function to fix imgur links.
+func fixImgurLink(link string) string {
+	if strings.Contains(link, "https://imgur.com/") {
+		parts := strings.Split(link, "/")
+		imageID := parts[len(parts)-1]
+		return "https://i.imgur.com/" + imageID + ".jpeg"
+	}
+	return link
+}
+
 func extractImageLinks(doc *goquery.Document) []string {
 	var links []string
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
 		if isImageLink(imgLink) {
-			if strings.Contains(imgLink, "https://imgur.com/") {
-				imgLink = imgLink + ".jpg"
-			}
+			// Replace imgur.com link using helper.
+			imgLink = fixImgurLink(imgLink)
 			links = append(links, imgLink)
 		}
 	})
@@ -79,9 +88,8 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
 		if isImageLink(imgLink) {
-			if strings.Contains(imgLink, "https://imgur.com/") {
-				imgLink = imgLink + ".jpg"
-			}
+			// Replace imgur.com link using helper.
+			imgLink = fixImgurLink(imgLink)
 			allImages = append(allImages, imgLink)
 			foundImage = true
 		}
@@ -177,9 +185,8 @@ func (p *PTT) GetAllImageAddress(target string) []string {
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
 		imgLink, _ := s.Attr("href")
 		if isImageLink(imgLink) {
-			if strings.Contains(imgLink, "https://imgur.com/") {
-				imgLink = imgLink + ".jpg"
-			}
+			// Replace imgur.com link using helper.
+			imgLink = fixImgurLink(imgLink)
 			ret = append(ret, imgLink)
 			foundImage = true
 		}

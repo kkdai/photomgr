@@ -79,12 +79,14 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 	defer wg.Done()
 
 	for target := range linkChan {
-		// Create request with custom Referer if needed.
 		req, err := http.NewRequest("GET", target, nil)
 		if err != nil {
 			log.Printf("http.NewRequest error: %s, target: %s", err, target)
 			continue
 		}
+		// Set User-Agent header
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+		// Set Referer header if target is from i.imgur.com
 		if strings.Contains(target, "i.imgur.com") {
 			re := regexp.MustCompile(`([^\/]+)\.(jpg|jpeg|png)`)
 			matches := re.FindStringSubmatch(target)
@@ -92,6 +94,7 @@ func (b *baseCrawler) worker(destDir string, linkChan chan string, wg *sync.Wait
 				req.Header.Set("Referer", "https://imgur.com/"+matches[1])
 			}
 		}
+
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
