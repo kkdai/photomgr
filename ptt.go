@@ -1,5 +1,23 @@
 package photomgr
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
+	"sync"
+
+	"github.com/PuerkitoBio/goquery"
+)
+
 // PttPostEntry represents a single post entry from the PTT index page.
 type PttPostEntry struct {
 	Title     string `json:"title"`
@@ -46,24 +64,6 @@ type FirecrawlResponse struct {
 	Error   *FirecrawlError       `json:"error,omitempty"` // Pointer to allow for null error field
 }
 
-import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strconv"
-	"strings"
-	"sync"
-
-	"github.com/PuerkitoBio/goquery"
-)
-
 // extractArticleIDFromURL extracts the PTT article ID from its URL.
 // Example: "https://www.ptt.cc/bbs/Beauty/M.1234567890.A.BCD.html" -> "M.1234567890.A.BCD"
 func extractArticleIDFromURL(url string) string {
@@ -99,12 +99,12 @@ func parsePushCount(pushStr string) int {
 // obtained from Firecrawl.
 //
 // The function assumes markdown where each post entry is represented by a block with:
-// 1. A title line starting with "## ", which may include a category like "[正妹]".
-//    Example: "## [正妹] Post Title 1"
-// 2. A line containing a markdown link, where the URL is the full path to the post.
-//    Example: "[Read More](https://www.ptt.cc/bbs/Beauty/M.123.A.XYZ.html)"
-// 3. A line detailing the author, date, and push count.
-//    Example: "Author: author1 Date: 5/24 Push: 10"
+//  1. A title line starting with "## ", which may include a category like "[正妹]".
+//     Example: "## [正妹] Post Title 1"
+//  2. A line containing a markdown link, where the URL is the full path to the post.
+//     Example: "[Read More](https://www.ptt.cc/bbs/Beauty/M.123.A.XYZ.html)"
+//  3. A line detailing the author, date, and push count.
+//     Example: "Author: author1 Date: 5/24 Push: 10"
 //
 // It uses a regular expression to capture these elements for each post.
 func parseMarkdownToPostDocs(markdown string, baseAddress string) []PostDoc {
@@ -128,16 +128,15 @@ func parseMarkdownToPostDocs(markdown string, baseAddress string) []PostDoc {
 
 		title := strings.TrimSpace(match[1])
 		url := strings.TrimSpace(match[2])
-		author := strings.TrimSpace(match[3])
 		// Date is match[4] - not directly used in PostDoc, but good to extract
-		_ = strings.TrimSpace(match[4]) 
+		_ = strings.TrimSpace(match[4])
 		pushStr := strings.TrimSpace(match[5])
 
 		// Ensure URL is absolute
 		if !strings.HasPrefix(url, "http") {
 			url = baseAddress + url
 		}
-		
+
 		// Filter out announcements or other non-post entries based on title, if necessary.
 		// For now, we assume all matches are valid posts.
 		// Example: if strings.HasPrefix(title, "[公告]") { continue }
@@ -146,7 +145,6 @@ func parseMarkdownToPostDocs(markdown string, baseAddress string) []PostDoc {
 			log.Printf("Skipping post with title not matching Beauty criteria: %s", title)
 			continue
 		}
-
 
 		articleID := extractArticleIDFromURL(url)
 		likeCount := parsePushCount(pushStr)
@@ -174,7 +172,6 @@ func min(a, b int) int {
 	return b
 }
 
-
 type PTT struct {
 	//Inherit
 	baseCrawler
@@ -199,11 +196,12 @@ var firecrawlScrapeURL = "https://api.firecrawl.dev/v1/scrape"
 // - Parameters to specify the format ("markdown"), focus on main content, and wait time.
 //
 // Expected JSON response structure from Firecrawl:
-// {
-//   "success": true/false,
-//   "data": { "markdown": "..." }, // if success is true
-//   "error": { "code": ..., "message": "..." } // if success is false
-// }
+//
+//	{
+//	  "success": true/false,
+//	  "data": { "markdown": "..." }, // if success is true
+//	  "error": { "code": ..., "message": "..." } // if success is false
+//	}
 //
 // The function returns the extracted markdown content or an error if any step fails.
 func callFirecrawlAPI(targetURL string) (string, error) {
@@ -319,15 +317,15 @@ func extractImageLinks(doc *goquery.Document) []string {
 // the resulting markdown to extract article details.
 //
 // It assumes the markdown for an article page contains:
-// 1. A metadata block at the beginning, formatted with bolded field names:
-//    **Author**: author_username (Nickname)
-//    **Board**: BoardName
-//    **Title**: Article Title
-//    **Date**: Full Date String
-// 2. Image URLs in standard markdown format: `![](image_url)` or `![alt text](image_url)`.
-// 3. The main textual content of the post.
-// 4. A signature/push message section at the end, typically starting with lines like
-//    "--", "※ 發信站:", "推 ", "噓 ", etc.
+//  1. A metadata block at the beginning, formatted with bolded field names:
+//     **Author**: author_username (Nickname)
+//     **Board**: BoardName
+//     **Title**: Article Title
+//     **Date**: Full Date String
+//  2. Image URLs in standard markdown format: `![](image_url)` or `![alt text](image_url)`.
+//  3. The main textual content of the post.
+//  4. A signature/push message section at the end, typically starting with lines like
+//     "--", "※ 發信站:", "推 ", "噓 ", etc.
 //
 // The function returns the article title, a slice of all found image URLs, and
 // 0, 0 for like and dislike counts (as these are not reliably parsed from markdown).
@@ -408,16 +406,16 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	//   → (start of a neutral comment)
 	//   ◆ From: (another PTT origin info format)
 	signatureRegex := regexp.MustCompile(`(?m)^(?:--\s*$|※\s(?:發信站|編輯|轉錄至看板|推噓紀錄).*|推\s|噓\s|→\s|◆\sFrom:)`)
-	
+
 	// Search for signature block only in the part of markdown *after* the metadata.
 	// If contentStartIndex is 0 (e.g. metadata parsing failed), search from start of markdown.
 	searchableMarkdownArea := ""
 	if contentStartIndex <= len(markdown) {
 		searchableMarkdownArea = markdown[contentStartIndex:]
 	}
-	
+
 	signatureMatchIndices := signatureRegex.FindStringIndex(searchableMarkdownArea)
-	
+
 	contentEndIndex := len(markdown) // Default to end of markdown if no signature found
 	if signatureMatchIndices != nil {
 		// Adjust index relative to the full markdown string
@@ -428,7 +426,7 @@ func (p *PTT) GetAllFromURL(url string) (title string, allImages []string, like,
 	if contentEndIndex > contentStartIndex && contentStartIndex < len(markdown) && contentEndIndex <= len(markdown) {
 		rawContent = markdown[contentStartIndex:contentEndIndex]
 	}
-	
+
 	// Remove any markdown image lines from the extracted rawContent block to avoid duplication.
 	cleanedContentLines := []string{}
 	for _, line := range strings.Split(rawContent, "\n") {
@@ -666,7 +664,6 @@ func (p *PTT) ParsePttPageByIndex(page int, replace bool) int {
 		log.Printf("ParsePttPageByIndex: Target URL for page 0 (latest): %s", targetURL)
 	}
 
-
 	markdown, err := callFirecrawlAPI(targetURL)
 	if err != nil {
 		log.Printf("Error calling Firecrawl API for URL %s: %v", targetURL, err)
@@ -714,7 +711,7 @@ func (p *PTT) GetPostLikeDis(target string) (int, int) {
 	resp := getResponseWithCookie(target)
 	if resp == nil { // Added check for nil response
 		log.Printf("GetPostLikeDis: Failed to get response for %s", target)
-		return 0,0
+		return 0, 0
 	}
 	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
