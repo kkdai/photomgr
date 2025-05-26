@@ -11,6 +11,32 @@ Install
 
     go get github.com/kkdai/photomgr
 
+Configuration
+---------------
+
+### PTT Functionality (Firecrawl API)
+
+To use the PTT scraping features (e.g., `ptt_cli`), you need a Firecrawl API key.
+Firecrawl is used to fetch and parse PTT pages. You can obtain an API key from [https://www.firecrawl.dev/](https://www.firecrawl.dev/).
+
+Set the API key as an environment variable named `FIRECRAWL_KEY`:
+
+For Linux/macOS:
+```bash
+export FIRECRAWL_KEY="YOUR_FIRECRAWL_API_KEY"
+```
+
+For Windows (Command Prompt):
+```cmd
+set FIRECRAWL_KEY=YOUR_FIRECRAWL_API_KEY
+```
+
+Alternatively, you can place it in a `.env` file in the project root if your environment supports it (this project does not automatically load `.env` files, so you'd need a mechanism like `godotenv` or run it as `source .env && ./your_app`):
+```
+FIRECRAWL_KEY="YOUR_FIRECRAWL_API_KEY"
+```
+Ensure this variable is set before running any PTT-related commands.
+
 Usage
 ---------------------
 
