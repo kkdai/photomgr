@@ -37,13 +37,13 @@ type PttArticle struct {
 	Content   string   `json:"content"`
 }
 
-// FirecrawlRequest defines the structure for the Firecrawl API request body.
+// FirecrawlRequest defines the structure for the Firecrawl v2 API request body.
 type FirecrawlRequest struct {
 	URL             string            `json:"url"`
-	Headers         map[string]string `json:"headers"`
-	Formats         []string          `json:"formats"`
+	Headers         map[string]string `json:"headers,omitempty"`
+	Formats         []string          `json:"formats,omitempty"`
 	OnlyMainContent bool              `json:"onlyMainContent"`
-	WaitFor         int               `json:"waitFor"`
+	WaitFor         int               `json:"waitFor,omitempty"`
 }
 
 // FirecrawlResponseData defines the structure of the "data" field in Firecrawl's response.
@@ -51,17 +51,12 @@ type FirecrawlResponseData struct {
 	Markdown string `json:"markdown"`
 }
 
-// FirecrawlError defines the structure of the "error" field in Firecrawl's response.
-type FirecrawlError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-// FirecrawlResponse defines the structure for the Firecrawl API response.
+// FirecrawlResponse defines the structure for the Firecrawl v2 API response.
 type FirecrawlResponse struct {
 	Success bool                  `json:"success"`
 	Data    FirecrawlResponseData `json:"data"`
-	Error   *FirecrawlError       `json:"error,omitempty"` // Pointer to allow for null error field
+	Code    string                `json:"code,omitempty"`
+	Error   string                `json:"error,omitempty"`
 }
 
 // extractArticleIDFromURL extracts the PTT article ID from its URL.
@@ -181,11 +176,11 @@ type PTT struct {
 	SearchAddress string
 }
 
-// firecrawlScrapeURL is the endpoint for the Firecrawl API.
+// firecrawlScrapeURL is the endpoint for the Firecrawl v2 API.
 // It's a global variable to allow overriding for testing purposes.
-var firecrawlScrapeURL = "https://api.firecrawl.dev/v1/scrape"
+var firecrawlScrapeURL = "https://api.firecrawl.dev/v2/scrape"
 
-// callFirecrawlAPI makes a POST request to the Firecrawl API (specifically to `firecrawlScrapeURL`)
+// callFirecrawlAPI makes a POST request to the Firecrawl v2 API (specifically to `firecrawlScrapeURL`)
 // to scrape and retrieve the content of the given `targetURL` as markdown.
 //
 // It requires the `FIRECRAWL_KEY` environment variable to be set for authorization.
@@ -195,12 +190,12 @@ var firecrawlScrapeURL = "https://api.firecrawl.dev/v1/scrape"
 // - Headers, including a "Cookie: over18=1" to bypass PTT's age verification.
 // - Parameters to specify the format ("markdown"), focus on main content, and wait time.
 //
-// Expected JSON response structure from Firecrawl:
+// Expected JSON response structure from Firecrawl v2:
 //
 //	{
 //	  "success": true/false,
 //	  "data": { "markdown": "..." }, // if success is true
-//	  "error": { "code": ..., "message": "..." } // if success is false
+//	  "code": "...", "error": "..." // if success is false
 //	}
 //
 // The function returns the extracted markdown content or an error if any step fails.
@@ -257,8 +252,11 @@ func callFirecrawlAPI(targetURL string) (string, error) {
 	}
 
 	if !firecrawlResp.Success {
-		if firecrawlResp.Error != nil {
-			return "", fmt.Errorf("Firecrawl API error (%d): %s", firecrawlResp.Error.Code, firecrawlResp.Error.Message)
+		if firecrawlResp.Error != "" {
+			if firecrawlResp.Code != "" {
+				return "", fmt.Errorf("Firecrawl API error (%s): %s", firecrawlResp.Code, firecrawlResp.Error)
+			}
+			return "", fmt.Errorf("Firecrawl API error: %s", firecrawlResp.Error)
 		}
 		return "", errors.New("Firecrawl API call was not successful, but no error message was provided")
 	}

@@ -211,10 +211,10 @@ func TestCallFirecrawlAPI_Successful(t *testing.T) {
 		if r.Header.Get("Authorization") != "Bearer test_api_key" {
 			t.Errorf("Expected Authorization header 'Bearer test_api_key', got '%s'", r.Header.Get("Authorization"))
 		}
-		if r.URL.Path != "/v1/scrape" { // Assuming the global var changes the full URL path
+		if r.URL.Path != "/v2/scrape" { // Assuming the global var changes the full URL path
 			// If firecrawlScrapeURL is just the base, this check should be "/"
 			// Based on current setup, firecrawlScrapeURL is the full path.
-			t.Errorf("Expected path '/v1/scrape', got '%s'", r.URL.Path)
+			t.Errorf("Expected path '/v2/scrape', got '%s'", r.URL.Path)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -229,7 +229,7 @@ func TestCallFirecrawlAPI_Successful(t *testing.T) {
 	defer server.Close()
 
 	originalURL := firecrawlScrapeURL
-	firecrawlScrapeURL = server.URL // The global var is the full URL path
+	firecrawlScrapeURL = server.URL + "/v2/scrape" // The global var is the full URL path
 	t.Cleanup(func() {
 		firecrawlScrapeURL = originalURL
 	})
@@ -253,7 +253,8 @@ func TestCallFirecrawlAPI_FirecrawlErrorResponse(t *testing.T) {
 		w.WriteHeader(http.StatusOK) // API returns 200 OK but with error in JSON
 		fmt.Fprintln(w, `{
 			"success": false,
-			"error": { "code": 4001, "message": "Test API error from Firecrawl" }
+			"code": "BAD_REQUEST",
+			"error": "Test API error from Firecrawl"
 		}`)
 	}))
 	defer server.Close()
@@ -268,7 +269,7 @@ func TestCallFirecrawlAPI_FirecrawlErrorResponse(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error, but got nil")
 	}
-	expectedErrorMsg := "Firecrawl API error (4001): Test API error from Firecrawl"
+	expectedErrorMsg := "Firecrawl API error (BAD_REQUEST): Test API error from Firecrawl"
 	if !strings.Contains(err.Error(), expectedErrorMsg) {
 		t.Errorf("expected error message to contain '%s', got: %v", expectedErrorMsg, err)
 	}
@@ -1078,7 +1079,8 @@ func TestGetAllFromURL_FirecrawlAPISuccessFalse(t *testing.T) {
 		w.WriteHeader(http.StatusOK) // API itself is OK, but reports failure
 		response := FirecrawlResponse{
 			Success: false,
-			Error:   &FirecrawlError{Code: 123, Message: "API failed"},
+			Code:    "123",
+			Error:   "API failed",
 		}
 		json.NewEncoder(w).Encode(response)
 	}))
